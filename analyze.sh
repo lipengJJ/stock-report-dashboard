@@ -19,5 +19,7 @@ p.write_text(json.dumps(data, indent=2))
 EOF
 
 echo "开始执行分析任务，日志文件：$LOG_FILE"
-claude -p "$(cat run_analysis.md)" --verbose 2>&1 | tee "$LOG_FILE"
+# claude的输出对象是管道(tee)而非终端时，很多程序会切成全缓冲，导致日志文件长时间看起来是空的。
+# 用stdbuf强制成行缓冲，保证tee能实时写入。
+stdbuf -oL -eL claude -p "$(cat run_analysis.md)" --verbose 2>&1 | tee "$LOG_FILE"
 echo "执行完成，日志已保存到 $LOG_FILE"

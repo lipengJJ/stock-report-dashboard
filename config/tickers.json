@@ -1,4 +1,4 @@
 {
-  "tickers": ["AAPL", "QQQ"],
+  "tickers": ["AAPL", "QQQ", "NVDA", "TSLA"],
   "period": "2-10个交易日波段"
 }
