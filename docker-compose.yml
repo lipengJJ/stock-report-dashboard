@@ -11,9 +11,11 @@ services:
       - ./config:/app/config
       # analyze.sh 执行日志挂载到宿主机，容器重建不丢历史日志
       - ./logs:/app/logs
-      # 挂载宿主机已登录的 claude 配置，容器内 claude CLI 直接复用鉴权，无需重复登录
+      # 挂载宿主机已登录的 claude 配置（鉴权token在 .credentials.json，在这个目录下），
+      # 容器内 claude CLI 直接复用鉴权，无需重复登录。
+      # 只挂目录、不单独挂 ~/.claude.json 这个文件——bind mount单个文件时，
+      # 如果宿主机路径不存在会被Docker误建成目录，只挂目录没有这个问题。
       - ${HOME}/.claude:/root/.claude
-      - ${HOME}/.claude.json:/root/.claude.json
     environment:
       # 如果不用挂载 ~/.claude 鉴权，也可以改用 API Key 方式（二选一）
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}

@@ -30,21 +30,36 @@ streamlit run dashboard.py
 
 镜像内打包了 Streamlit 看板 **和** Claude Code CLI，方便直接在容器内跑分析、产出新的 `data/*.json`，看板立即可见（无需重新构建镜像）。
 
+### 0. 在宿主机上先安装 Claude Code CLI 并登录（每台新机器只需一次）
+
+`docker-compose.yml` 只挂载宿主机的 `~/.claude` 目录（鉴权token在里面的 `.credentials.json`），容器内claude CLI直接复用鉴权。**必须先在宿主机上跑一次 `claude login`**，让这个目录以正确内容生成出来，再启动容器。
+
+```bash
+# 宿主机上安装 Node.js 22+ 和 Claude Code CLI
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo bash -
+sudo apt-get install -y nodejs
+sudo npm install -g @anthropic-ai/claude-code
+
+# 登录（走一次OAuth流程）
+claude login
+```
+
+登录成功后，`~/.claude/`（目录，含 `.credentials.json` 等）就会正常生成在宿主机上，之后容器直接复用，不需要在容器里重复登录。
+
+注意：`docker-compose.yml` 特意**只挂 `~/.claude` 这个目录，不单独挂 `~/.claude.json` 这个文件**——bind mount单个文件时，如果宿主机路径不存在会被Docker自动误建成一个空目录（而不是文件），之前踩过这个坑（`IsADirectoryError`）。容器内的 `/root/.claude.json`（存工作区信任状态等）就留在容器本地，不做跨容器持久化，`analyze.sh` 每次执行时会自动重新写好需要的字段（见下文）。
+
+如果不想在宿主机装claude，也可以用 **API Key方式**替代（不依赖 `~/.claude` 挂载）：新建 `.env` 文件（不要提交到git）：
+```
+ANTHROPIC_API_KEY=sk-ant-xxxx
+```
+
 ### 1. 构建镜像
 
 ```bash
 docker compose build
 ```
 
-### 2. 配置 Claude CLI 鉴权（二选一）
-
-- **方式A（推荐，复用本机已登录状态）**：`docker-compose.yml` 里已经挂载了 `~/.claude` 和 `~/.claude.json`，只要你本机的 `claude` 已经登录过，容器内直接可用，无需重复认证。
-- **方式B（API Key）**：新建 `.env` 文件（不要提交到git）：
-  ```
-  ANTHROPIC_API_KEY=sk-ant-xxxx
-  ```
-
-### 3. 启动服务
+### 2. 启动服务
 
 ```bash
 docker compose up -d
@@ -52,7 +67,7 @@ docker compose up -d
 
 浏览器访问 `http://<部署机器IP>:8501` 即可看到渲染好的报告。
 
-### 4. 在容器内生成新报告
+### 3. 在容器内生成新报告
 
 Prompt已固定在 `run_analysis.md` 里，要分析哪些标的改 `config/tickers.json` 就行，不需要每次手写prompt：
 
@@ -100,6 +115,6 @@ docker compose exec stock-dashboard bash
 
 ## 安全提示
 
-- `.env`、`~/.claude.json` 含有鉴权凭据，已加入 `.gitignore` / `.dockerignore`，不要提交到 git 或打进镜像里。
+- `.env`、`~/.claude/`（含 `.credentials.json`）含有鉴权凭据，均不在本仓库内、也不会打进镜像，只在运行时以volume挂载进容器，不要提交到 git。
 - 本报告为工具数据驱动的研究性分析，不构成个性化投资建议。
 # stock-report-dashboard
