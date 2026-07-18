@@ -73,6 +73,8 @@ docker compose exec stock-dashboard bash
 
 `./analyze.sh` 会自动把这次执行的完整输出（含 `--verbose` 工具调用过程）保存到 `logs/analyze_<时间戳>.log`，同时打印到终端。`logs/` 已挂载到宿主机，容器重建不会丢历史日志；也已加入 `.gitignore` / `.dockerignore`，不会被提交或打进镜像。
 
+`analyze.sh` 每次执行前会自动把 `/app` 标记为已信任工作区（写入 `~/.claude.json` 的 `projects["/app"].hasTrustDialogAccepted`），配合 `.claude/settings.json` 里的权限白名单，headless模式（`claude -p`，无交互终端）下也能正常跑，不会卡在权限确认或信任弹窗上。
+
 也可以把 `./analyze.sh` 包装成宿主机的 cron / 定时任务，通过 `docker compose exec stock-dashboard ./analyze.sh` 定时触发。
 
 ## data/*.json 字段说明
