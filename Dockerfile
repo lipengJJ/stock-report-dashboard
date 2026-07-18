@@ -19,6 +19,7 @@ COPY run_analysis.md .
 COPY analyze.sh .
 COPY config/ ./config/
 COPY data/ ./data/
+COPY .claude/ ./.claude/
 RUN chmod +x analyze.sh
 
 EXPOSE 8501
