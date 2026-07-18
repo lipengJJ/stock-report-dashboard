@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "mcp__claude_ai_stocks-inte__*"
+      "mcp__claude_ai_stocks-inte__*",
+      "Write(data/**)"
     ]
   }
 }
