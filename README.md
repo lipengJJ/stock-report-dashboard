@@ -86,3 +86,4 @@ claude -p "针对 NVDA 按照交易分析报告格式做完整分析，最终按
 
 - `.env`、`~/.claude.json` 含有鉴权凭据，已加入 `.gitignore` / `.dockerignore`，不要提交到 git 或打进镜像里。
 - 本报告为工具数据驱动的研究性分析，不构成个性化投资建议。
+# stock-report-dashboard
