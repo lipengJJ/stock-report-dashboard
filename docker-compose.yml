@@ -7,6 +7,8 @@ services:
     volumes:
       # data/ 挂载到宿主机，容器内生成的新报告可持久化，重建镜像不丢数据
       - ./data:/app/data
+      # config/tickers.json 挂载到宿主机，改要分析的标的不用重新build镜像
+      - ./config:/app/config
       # 挂载宿主机已登录的 claude 配置，容器内 claude CLI 直接复用鉴权，无需重复登录
       - ${HOME}/.claude:/root/.claude
       - ${HOME}/.claude.json:/root/.claude.json

@@ -15,7 +15,11 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY dashboard.py .
+COPY run_analysis.md .
+COPY analyze.sh .
+COPY config/ ./config/
 COPY data/ ./data/
+RUN chmod +x analyze.sh
 
 EXPOSE 8501
 

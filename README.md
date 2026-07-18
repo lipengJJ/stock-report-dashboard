@@ -54,12 +54,24 @@ docker compose up -d
 
 ### 4. 在容器内生成新报告
 
+Prompt已固定在 `run_analysis.md` 里，要分析哪些标的改 `config/tickers.json` 就行，不需要每次手写prompt：
+
 ```bash
 docker compose exec stock-dashboard bash
-claude -p "针对 NVDA 按照交易分析报告格式做完整分析，最终按照 data/AAPL_20260718.json 的字段结构，把结果写入 /app/data/NVDA_$(date +%Y%m%d).json"
+./analyze.sh
 ```
 
-生成完成后回到浏览器点"🔄 刷新数据"即可看到新标的。也可以把上面这条 `claude -p ...` 命令包装成宿主机的 cron / 定时任务，通过 `docker compose exec` 定时触发。
+`config/tickers.json` 示例：
+```json
+{
+  "tickers": ["AAPL", "QQQ", "NVDA"],
+  "period": "2-10个交易日波段"
+}
+```
+
+改完这个文件、跑一次 `./analyze.sh`，就会把里面列出的所有标的都跑一遍分析，写入 `data/<TICKER>_<YYYYMMDD>.json`。生成完成后回到浏览器点"🔄 刷新数据"即可看到新标的。
+
+也可以把 `./analyze.sh` 包装成宿主机的 cron / 定时任务，通过 `docker compose exec stock-dashboard ./analyze.sh` 定时触发。
 
 ## data/*.json 字段说明
 
