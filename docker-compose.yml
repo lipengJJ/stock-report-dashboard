@@ -9,6 +9,8 @@ services:
       - ./data:/app/data
       # config/tickers.json 挂载到宿主机，改要分析的标的不用重新build镜像
       - ./config:/app/config
+      # analyze.sh 执行日志挂载到宿主机，容器重建不丢历史日志
+      - ./logs:/app/logs
       # 挂载宿主机已登录的 claude 配置，容器内 claude CLI 直接复用鉴权，无需重复登录
       - ${HOME}/.claude:/root/.claude
       - ${HOME}/.claude.json:/root/.claude.json

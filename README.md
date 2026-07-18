@@ -71,6 +71,8 @@ docker compose exec stock-dashboard bash
 
 改完这个文件、跑一次 `./analyze.sh`，就会把里面列出的所有标的都跑一遍分析，写入 `data/<TICKER>_<YYYYMMDD>.json`。生成完成后回到浏览器点"🔄 刷新数据"即可看到新标的。
 
+`./analyze.sh` 会自动把这次执行的完整输出（含 `--verbose` 工具调用过程）保存到 `logs/analyze_<时间戳>.log`，同时打印到终端。`logs/` 已挂载到宿主机，容器重建不会丢历史日志；也已加入 `.gitignore` / `.dockerignore`，不会被提交或打进镜像。
+
 也可以把 `./analyze.sh` 包装成宿主机的 cron / 定时任务，通过 `docker compose exec stock-dashboard ./analyze.sh` 定时触发。
 
 ## data/*.json 字段说明
